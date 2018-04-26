@@ -1,0 +1,21 @@
+{
+  "name": "nooxserver",
+  "version": "1.0.0",
+  "main": "app.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "express-promise-router": "^2.0.0",
+    "joi": "^10.6.0",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.7",
+    "morgan": "^1.8.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
