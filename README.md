@@ -1,0 +1,2 @@
+# snoox
+noox server
