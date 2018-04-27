@@ -4,12 +4,15 @@
   "main": "app.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "gstart": "nodemon gql-server.js"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
+    "express-graphql": "^0.6.12",
     "express-promise-router": "^2.0.0",
+    "graphql": "^0.13.2",
     "joi": "^10.6.0",
     "mongodb": "^2.2.31",
     "mongoose": "^4.11.7",

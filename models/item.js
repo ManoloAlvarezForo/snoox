@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const itemSchema = new Schema({
     name: String,
-    description: String
+    description: String,
+    itemId: Number
 });
 
 const Route = mongoose.model('item', itemSchema);
