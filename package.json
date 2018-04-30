@@ -4,8 +4,7 @@
   "main": "app.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon app.js",
-    "gstart": "nodemon gql-server.js"
+    "start": "nodemon app.js"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
