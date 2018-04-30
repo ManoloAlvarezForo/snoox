@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const itemSchema = new Schema({
+const authorSchema = new Schema({
     name: String,
-    description: String
+    age: Number
 });
 
-const Route = mongoose.model('item', itemSchema);
+const Route = mongoose.model('author', authorSchema);
 module.exports = Route
