@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const bookSchema = new Schema({
     name: String,
     genre: String,
-    author: { type: Schema.Types.ObjectId, ref: 'author'}
+    authorId: String
 });
 
 const Route = mongoose.model('book', bookSchema);

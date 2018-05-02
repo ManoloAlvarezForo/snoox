@@ -2,7 +2,7 @@ const Book = require('../models/book');
 
 module.exports = {
     getBooks: async () => {
-        return await Book.find({});;
+        return await Book.find({});
     },
 
     addBook: async (args) => {
@@ -11,6 +11,10 @@ module.exports = {
 
     getBookById: async (id) => {
         return await Book.findById(args.id);
+    },
+
+    getBookByAuthorId: async (authorId) => {
+        return await Book.find({authorId: authorId});
     },
 
     // replaceBook: async (parent, args) => {

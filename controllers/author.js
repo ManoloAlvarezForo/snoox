@@ -2,7 +2,7 @@ const Author = require('../models/author');
 
 module.exports = {
     getAuthors: async () => {
-        return await Author.find({});;
+        return await Author.find({});
     },
 
     addAuthor: async (args) => {
