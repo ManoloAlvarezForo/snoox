@@ -7,10 +7,15 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.15.4",
     "express-graphql": "^0.6.12",
+    "express-jwt": "^5.3.1",
+    "express-promise-router": "^3.0.2",
     "graphql": "^0.13.2",
+    "jsonwebtoken": "^8.3.0",
     "mongodb": "^2.2.31",
     "mongoose": "^4.11.7",
     "morgan": "^1.8.2"

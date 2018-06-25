@@ -1,26 +1,28 @@
 Arguments: 
-  /usr/local/Cellar/node@8/8.11.1/bin/node /usr/local/bin/yarn gstart
+  /usr/local/Cellar/node/10.4.1/bin/node /usr/local/Cellar/yarn/1.7.0/libexec/bin/yarn.js
 
 PATH: 
-  /usr/local/opt/node@8/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/usr/local/share/android-sdk/tools:/usr/local/share/android-sdk/platform-tools
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/usr/local/share/android-sdk/tools:/usr/local/share/android-sdk/platform-tools
 
 Yarn version: 
-  1.6.0
+  1.7.0
 
 Node version: 
-  8.11.1
+  10.4.1
 
 Platform: 
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/manoloalvarez/projects/servers/snoox/package.json: Unexpected token } in JSON at position 136
-      at JSON.parse (<anonymous>)
-      at /usr/local/lib/node_modules/yarn/lib/cli.js:1130:59
-      at Generator.next (<anonymous>)
-      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:98:30)
-      at /usr/local/lib/node_modules/yarn/lib/cli.js:109:13
-      at <anonymous>
+  Error: connect EHOSTUNREACH 104.18.95.96:443 - Local (10.31.95.118:61111)
+      at internalConnect (net.js:928:16)
+      at defaultTriggerAsyncIdScope (internal/async_hooks.js:294:19)
+      at emitLookup (net.js:1077:9)
+      at /usr/local/Cellar/yarn/1.7.0/libexec/lib/cli.js:103269:29
+      at /usr/local/Cellar/yarn/1.7.0/libexec/lib/cli.js:103115:25
+      at RawTask.module.exports.RawTask.call (/usr/local/Cellar/yarn/1.7.0/libexec/lib/cli.js:83658:19)
+      at flush (/usr/local/Cellar/yarn/1.7.0/libexec/lib/cli.js:83740:29)
+      at process._tickCallback (internal/process/next_tick.js:61:11)
 
 npm manifest: 
   {
@@ -29,15 +31,15 @@ npm manifest:
     "main": "app.js",
     "license": "MIT",
     "scripts": {
-      "start": "nodemon app.js",
+      "start": "nodemon app.js"
     },
     "dependencies": {
-      "body-parser": "^1.17.2",
+      "bcryptjs": "^2.4.3",
+      "cors": "^2.8.4",
       "express": "^4.15.4",
       "express-graphql": "^0.6.12",
-      "express-promise-router": "^2.0.0",
       "graphql": "^0.13.2",
-      "joi": "^10.6.0",
+      "jsonwebtoken": "^8.3.0",
       "mongodb": "^2.2.31",
       "mongoose": "^4.11.7",
       "morgan": "^1.8.2"
@@ -186,21 +188,6 @@ Lockfile:
     version "2.10.2"
     resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-2.10.2.tgz#024a5517295308857f14f91f1106fc3b555f446b"
   
-  body-parser@^1.17.2:
-    version "1.17.2"
-    resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.17.2.tgz#f8892abc8f9e627d42aedafbca66bf5ab99104ee"
-    dependencies:
-      bytes "2.4.0"
-      content-type "~1.0.2"
-      debug "2.6.7"
-      depd "~1.1.0"
-      http-errors "~1.6.1"
-      iconv-lite "0.4.15"
-      on-finished "~2.3.0"
-      qs "6.4.0"
-      raw-body "~2.2.0"
-      type-is "~1.6.15"
-  
   boom@2.x.x:
     version "2.10.1"
     resolved "https://registry.yarnpkg.com/boom/-/boom-2.10.1.tgz#39c8918ceff5799f83f9492a848f625add0c766f"
@@ -229,10 +216,6 @@ Lockfile:
   buffer-shims@~1.0.0:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/buffer-shims/-/buffer-shims-1.0.0.tgz#9978ce317388c649ad8793028c3477ef044a8b51"
-  
-  bytes@2.4.0:
-    version "2.4.0"
-    resolved "https://registry.yarnpkg.com/bytes/-/bytes-2.4.0.tgz#7d97196f9d5baf7f6935e25985549edd2a6c2339"
   
   bytes@3.0.0:
     version "3.0.0"
@@ -326,6 +309,13 @@ Lockfile:
     version "1.0.2"
     resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   
+  cors@^2.8.4:
+    version "2.8.4"
+    resolved "https://registry.yarnpkg.com/cors/-/cors-2.8.4.tgz#2bd381f2eb201020105cd50ea59da63090694686"
+    dependencies:
+      object-assign "^4"
+      vary "^1"
+  
   cryptiles@2.x.x:
     version "2.0.5"
     resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-2.0.5.tgz#3bdfecdc608147c1c67202fa291e7dca59eaa3b8"
@@ -337,12 +327,6 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
     dependencies:
       assert-plus "^1.0.0"
-  
-  debug@2.6.7:
-    version "2.6.7"
-    resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.7.tgz#92bad1f6d05bbb6bba22cca88bcd0ec894c2861e"
-    dependencies:
-      ms "2.0.0"
   
   debug@2.6.8, debug@^2.2.0:
     version "2.6.8"
@@ -459,14 +443,6 @@ Lockfile:
       content-type "^1.0.4"
       http-errors "^1.3.0"
       raw-body "^2.3.2"
-  
-  express-promise-router@^2.0.0:
-    version "2.0.0"
-    resolved "https://registry.yarnpkg.com/express-promise-router/-/express-promise-router-2.0.0.tgz#dd8c5894b40c061c8dcc6591d2145690e99e9551"
-    dependencies:
-      is-promise "^2.1.0"
-      lodash "^4.13.1"
-      methods "^1.0.0"
   
   express@^4.15.4:
     version "4.15.4"
@@ -705,15 +681,11 @@ Lockfile:
     version "2.16.3"
     resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
   
-  hoek@4.x.x:
-    version "4.2.0"
-    resolved "https://registry.yarnpkg.com/hoek/-/hoek-4.2.0.tgz#72d9d0754f7fe25ca2d01ad8f8f9a9449a89526d"
-  
   hooks-fixed@2.0.0:
     version "2.0.0"
     resolved "https://registry.yarnpkg.com/hooks-fixed/-/hooks-fixed-2.0.0.tgz#a01d894d52ac7f6599bbb1f63dfc9c411df70cba"
   
-  http-errors@1.6.2, http-errors@~1.6.1, http-errors@~1.6.2:
+  http-errors@1.6.2, http-errors@~1.6.2:
     version "1.6.2"
     resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.6.2.tgz#0a002cc85707192a7e7946ceedc11155f60ec736"
     dependencies:
@@ -738,10 +710,6 @@ Lockfile:
       assert-plus "^0.2.0"
       jsprim "^1.2.2"
       sshpk "^1.7.0"
-  
-  iconv-lite@0.4.15:
-    version "0.4.15"
-    resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.15.tgz#fe265a218ac6a57cfe854927e9d04c19825eddeb"
   
   iconv-lite@0.4.19:
     version "0.4.19"
@@ -848,10 +816,6 @@ Lockfile:
     version "2.0.0"
     resolved "https://registry.yarnpkg.com/is-primitive/-/is-primitive-2.0.0.tgz#207bab91638499c07b2adf240a41a87210034575"
   
-  is-promise@^2.1.0:
-    version "2.1.0"
-    resolved "https://registry.yarnpkg.com/is-promise/-/is-promise-2.1.0.tgz#79a2a9ece7f096e80f36d2b2f3bc16c1ff4bf3fa"
-  
   is-redirect@^1.0.0:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/is-redirect/-/is-redirect-1.0.0.tgz#1d03dded53bd8db0f30c26e4f95d36fc7c87dc24"
@@ -868,10 +832,6 @@ Lockfile:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
   
-  isemail@2.x.x:
-    version "2.2.1"
-    resolved "https://registry.yarnpkg.com/isemail/-/isemail-2.2.1.tgz#0353d3d9a62951080c262c2aa0a42b8ea8e9e2a6"
-  
   isobject@^2.0.0:
     version "2.1.0"
     resolved "https://registry.yarnpkg.com/isobject/-/isobject-2.1.0.tgz#f065561096a3f1da2ef46272f815c840d87e0c89"
@@ -882,22 +842,9 @@ Lockfile:
     version "0.1.2"
     resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   
-  items@2.x.x:
-    version "2.1.1"
-    resolved "https://registry.yarnpkg.com/items/-/items-2.1.1.tgz#8bd16d9c83b19529de5aea321acaada78364a198"
-  
   iterall@^1.2.1:
     version "1.2.2"
     resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.2.2.tgz#92d70deb8028e0c39ff3164fdbf4d8b088130cd7"
-  
-  joi@^10.6.0:
-    version "10.6.0"
-    resolved "https://registry.yarnpkg.com/joi/-/joi-10.6.0.tgz#52587f02d52b8b75cdb0c74f0b164a191a0e1fc2"
-    dependencies:
-      hoek "4.x.x"
-      isemail "2.x.x"
-      items "2.x.x"
-      topo "2.x.x"
   
   jsbn@~0.1.0:
     version "0.1.1"
@@ -1018,7 +965,7 @@ Lockfile:
     version "3.6.1"
     resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
   
-  lodash@^4.13.1, lodash@^4.14.0:
+  lodash@^4.14.0:
     version "4.17.4"
     resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
   
@@ -1038,7 +985,7 @@ Lockfile:
     version "1.0.1"
     resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
   
-  methods@^1.0.0, methods@~1.1.2:
+  methods@~1.1.2:
     version "1.1.2"
     resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   
@@ -1254,7 +1201,7 @@ Lockfile:
     version "3.0.0"
     resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-3.0.0.tgz#9bedd5ca0897949bca47e7ff408062d549f587f2"
   
-  object-assign@^4.0.1, object-assign@^4.1.0:
+  object-assign@^4, object-assign@^4.0.1, object-assign@^4.1.0:
     version "4.1.1"
     resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
   
@@ -1373,13 +1320,13 @@ Lockfile:
     version "1.4.1"
     resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
   
-  qs@6.4.0, qs@~6.4.0:
-    version "6.4.0"
-    resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
-  
   qs@6.5.0:
     version "6.5.0"
     resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.0.tgz#8d04954d364def3efc55b5a0793e1e2c8b1e6e49"
+  
+  qs@~6.4.0:
+    version "6.4.0"
+    resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
   
   randomatic@^1.1.3:
     version "1.1.7"
@@ -1399,14 +1346,6 @@ Lockfile:
       bytes "3.0.0"
       http-errors "1.6.2"
       iconv-lite "0.4.19"
-      unpipe "1.0.0"
-  
-  raw-body@~2.2.0:
-    version "2.2.0"
-    resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.2.0.tgz#994976cf6a5096a41162840492f0bdc5d6e7fb96"
-    dependencies:
-      bytes "2.4.0"
-      iconv-lite "0.4.15"
       unpipe "1.0.0"
   
   rc@^1.0.1, rc@^1.1.7:
@@ -1721,12 +1660,6 @@ Lockfile:
     version "2.0.0"
     resolved "https://registry.yarnpkg.com/timed-out/-/timed-out-2.0.0.tgz#f38b0ae81d3747d628001f41dafc652ace671c0a"
   
-  topo@2.x.x:
-    version "2.0.2"
-    resolved "https://registry.yarnpkg.com/topo/-/topo-2.0.2.tgz#cd5615752539057c0dc0491a621c3bc6fbe1d182"
-    dependencies:
-      hoek "4.x.x"
-  
   touch@1.0.0:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/touch/-/touch-1.0.0.tgz#449cbe2dbae5a8c8038e30d71fa0ff464947c4de"
@@ -1795,6 +1728,10 @@ Lockfile:
   uuid@^3.0.0:
     version "3.1.0"
     resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
+  
+  vary@^1:
+    version "1.1.2"
+    resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   
   vary@~1.1.1:
     version "1.1.1"
