@@ -1,6 +1,8 @@
 const graphql = require('graphql');
-const bookController = require('../controllers/book');
-const authorController = require('../controllers/author');
+const BookResolver = require('../resolvers/book');
+const AuthorResolver = require('../resolvers/author');
+const UserResolver = require('../resolvers/user');
+const AuthenticationResolver = require('../resolvers/authentication');
 
 const {
     GraphQLObjectType,
@@ -11,6 +13,10 @@ const {
     GraphQLList
 } = graphql;
 
+const authorize = (user) => {
+    return user ? true : false
+}
+
 const AuthorType = new GraphQLObjectType({
     name: 'Author',
     fields: () => ({
@@ -20,7 +26,7 @@ const AuthorType = new GraphQLObjectType({
         books: {
             type: new GraphQLList(BookType),
             resolve(parent, args) {
-                return bookController.getBookByAuthorId(parent.id);
+                return BookResolver.getBookByAuthorId(parent.id);
             }
         }
     })
@@ -35,11 +41,33 @@ const BookType = new GraphQLObjectType({
         author: {
             type: AuthorType,
             resolve(parent, args) {
-                return authorController.getAuthorById(parent.authorId);
+                return AuthorResolver.getAuthorById(parent.authorId);
             }
         }
     })
 });
+
+const UserType = new GraphQLObjectType({
+    name: 'User',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString},
+        email: { type: GraphQLString},
+    })
+})
+
+const AuthPayLoadType = new GraphQLObjectType({
+    name: 'AuthPayLoad',
+    fields: () => (
+        {
+            token: { type: GraphQLString},
+            user: {
+                type: UserType
+            }
+        }
+    )
+})
+
 
 
 const RootQuery = new GraphQLObjectType({
@@ -48,28 +76,39 @@ const RootQuery = new GraphQLObjectType({
         author: {
             type: AuthorType,
             args: { id: { type: GraphQLID } },
-            resolve(parent, args) {
-                return authorController.getAuthorById(args.id);
+            resolve(_, args) {
+                return AuthorResolver.getAuthorById(args.id);
             }
         },
         authors: {
             type: new GraphQLList(AuthorType),
-            resolve(parent, args) {
-                return authorController.getAuthors();
+            resolve(_, args, context) {
+                return AuthorResolver.getAuthors();
             }
         },
         book: {
             type: BookType,
             args: { id: { type: GraphQLID } },
-            resolve(parent, args) {
-                return bookController.getBookById(args.id);
+            resolve(_, args, context) {
+                return BookResolver.getBookById(args.id);
             }
         },
         books: {
             type: new GraphQLList(BookType),
-            resolve(parent, args) {
-                let temp = bookController.getBooks();
+            resolve(_, args, context) {
+                let temp = BookResolver.getBooks();
                 return temp;
+            }
+        },
+        users: {
+            type:  new GraphQLList(UserType),
+            resolve(_, args, context) {
+                if (authorize(context.user)) {
+                    return UserResolver.getUsers()
+                } else {
+                   throw new Error('No Authorized')
+                }
+                
             }
         }
     }
@@ -85,7 +124,7 @@ const Mutations = new GraphQLObjectType({
                 age: { type: GraphQLInt }
             },
             resolve(parent, args) {
-                return authorController.addAuthor(args);
+                return AuthorResolver.addAuthor(args);
             }
         },
         addBook: {
@@ -96,7 +135,28 @@ const Mutations = new GraphQLObjectType({
                 authorId: { type: GraphQLID }
             },
             resolve(parent, args) {
-                return bookController.addBook(args);
+                return BookResolver.addBook(args);
+            }
+        },
+        login: {
+            type: AuthPayLoadType,
+            args: {
+                email: { type: GraphQLString},
+                password: { type: GraphQLString}
+            },
+            resolve(parent, args, context) {
+               return AuthenticationResolver.login(args);
+            }
+        },
+        signup: {
+            type: AuthPayLoadType,
+            args: {
+                email: { type: GraphQLString},
+                password: { type: GraphQLString},
+                name: { type: GraphQLString}
+            },
+            resolve(parent, args) {
+              return  AuthenticationResolver.signup(args);
             }
         }
     }
