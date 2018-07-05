@@ -3,6 +3,7 @@ const BookResolver = require('../resolvers/book');
 const AuthorResolver = require('../resolvers/author');
 const UserResolver = require('../resolvers/user');
 const AuthenticationResolver = require('../resolvers/authentication');
+const DashboardResolver = require('../resolvers/dashboard');
 
 const {
     GraphQLObjectType,
@@ -10,7 +11,8 @@ const {
     GraphQLInt,
     GraphQLID,
     GraphQLSchema,
-    GraphQLList
+    GraphQLList,
+    GraphQLInputObjectType
 } = graphql;
 
 const authorize = (user) => {
@@ -68,7 +70,42 @@ const AuthPayLoadType = new GraphQLObjectType({
     )
 })
 
+const DashboardType = new GraphQLObjectType({
+    name: 'Dashboard',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString},
+        description: { type: GraphQLString},
+        widgets: {
+            type: new GraphQLList(WidgetType),
+            resolve(parent, args, context) {
+               return DashboardResolver.getWidgetsByDashboardId(parent.id);
+            }
+        }
+    })
+})
 
+const WidgetType = new GraphQLObjectType({
+    name: 'Widget',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString},
+        description: { type: GraphQLString},
+        width: { type: GraphQLInt},
+        height: { type: GraphQLInt}
+    })
+})
+
+const WidgetInputType = new GraphQLInputObjectType({
+    name: 'WidgetInput',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString},
+        description: { type: GraphQLString},
+        width: { type: GraphQLInt},
+        height: { type: GraphQLInt}
+    })
+})
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
@@ -110,6 +147,19 @@ const RootQuery = new GraphQLObjectType({
                 }
                 
             }
+        },
+        dashboards: {
+            type: new GraphQLList(DashboardType),
+            resolve(_, args, context) {
+                return DashboardResolver.getDashboards()
+            }
+        },
+        widgets: {
+            type: new GraphQLList(WidgetType),
+            args: { id: { type: GraphQLID } },
+            resolve(_, args, context) {
+                return DashboardResolver.getWidgetsByDashboardId(args.id);
+            }
         }
     }
 });
@@ -117,6 +167,20 @@ const RootQuery = new GraphQLObjectType({
 const Mutations = new GraphQLObjectType({
     name: 'Mutations',
     fields: {
+        addDashboard: {
+            type: DashboardType,
+            args: {
+                name: { type: GraphQLString },
+                description: { type: GraphQLString },
+                widgets: {
+                    type: new GraphQLList(WidgetInputType)
+                }
+            },
+            resolve(_, args, context) {
+                return DashboardResolver.addDashboard(args);
+            }
+
+        },
         addAuthor: {
             type: AuthorType,
             args: {

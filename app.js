@@ -27,7 +27,6 @@ mongoose.Promise = global.Promise;
 
 // mongoose.connect('mongodb://localhost/nsone');
 const promise = mongoose.connect('mongodb://localhost/noox', {
-    useMongoClient: true,
     //other options
 });
 
