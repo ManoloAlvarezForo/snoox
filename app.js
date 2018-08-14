@@ -72,5 +72,6 @@ const https_port = 8443;
 //Start the Server.
 promise.then(function (db) {
     app.listen(port, () => console.log(`GraphQL Server is listening on port ${port}`));
+    // Uncomment this code code to enable https for the server.
     // https.createServer(options, app).listen(https_port, () =>  console.log(`GraphQL-Noox Server is listening on port ${https_port}`));
 });
