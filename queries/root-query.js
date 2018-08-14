@@ -1,10 +1,11 @@
 const graphql = require('graphql');
-const BookResolver = require('../resolvers/book');
-const AuthorResolver = require('../resolvers/author');
+
+// Resolvers
 const UserResolver = require('../resolvers/user');
 const AuthenticationResolver = require('../resolvers/authentication');
 const DashboardResolver = require('../resolvers/dashboard');
 
+// Graphql types
 const {
     GraphQLObjectType,
     GraphQLString,
@@ -18,36 +19,6 @@ const {
 const authorize = (user) => {
     return user ? true : false
 }
-
-const AuthorType = new GraphQLObjectType({
-    name: 'Author',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        age: { type: GraphQLString },
-        books: {
-            type: new GraphQLList(BookType),
-            resolve(parent, args) {
-                return BookResolver.getBookByAuthorId(parent.id);
-            }
-        }
-    })
-});
-
-const BookType = new GraphQLObjectType({
-    name: 'Book',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        genre: { type: GraphQLString },
-        author: {
-            type: AuthorType,
-            resolve(parent, args) {
-                return AuthorResolver.getAuthorById(parent.authorId);
-            }
-        }
-    })
-});
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -110,33 +81,6 @@ const WidgetInputType = new GraphQLInputObjectType({
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
-        author: {
-            type: AuthorType,
-            args: { id: { type: GraphQLID } },
-            resolve(_, args) {
-                return AuthorResolver.getAuthorById(args.id);
-            }
-        },
-        authors: {
-            type: new GraphQLList(AuthorType),
-            resolve(_, args, context) {
-                return AuthorResolver.getAuthors();
-            }
-        },
-        book: {
-            type: BookType,
-            args: { id: { type: GraphQLID } },
-            resolve(_, args, context) {
-                return BookResolver.getBookById(args.id);
-            }
-        },
-        books: {
-            type: new GraphQLList(BookType),
-            resolve(_, args, context) {
-                let temp = BookResolver.getBooks();
-                return temp;
-            }
-        },
         users: {
             type:  new GraphQLList(UserType),
             resolve(_, args, context) {
@@ -145,7 +89,6 @@ const RootQuery = new GraphQLObjectType({
                 } else {
                    throw new Error('No Authorized')
                 }
-                
             }
         },
         dashboards: {
@@ -180,27 +123,6 @@ const Mutations = new GraphQLObjectType({
                 return DashboardResolver.addDashboard(args);
             }
 
-        },
-        addAuthor: {
-            type: AuthorType,
-            args: {
-                name: { type: GraphQLString },
-                age: { type: GraphQLInt }
-            },
-            resolve(parent, args) {
-                return AuthorResolver.addAuthor(args);
-            }
-        },
-        addBook: {
-            type: BookType,
-            args: {
-                name: { type: GraphQLString },
-                genre: { type: GraphQLString },
-                authorId: { type: GraphQLID }
-            },
-            resolve(parent, args) {
-                return BookResolver.addBook(args);
-            }
         },
         login: {
             type: AuthPayLoadType,
