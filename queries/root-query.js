@@ -1,107 +1,90 @@
 const graphql = require('graphql');
 
 // Resolvers
-const UserResolver = require('../resolvers/user');
-const AuthenticationResolver = require('../resolvers/authentication');
-const DashboardResolver = require('../resolvers/dashboard');
+const AuthorResolvers = require('../resolvers/author');
+const PostResolvers = require('../resolvers/post');
+const CommentResolvers = require('../resolvers/comment');
 
 // Graphql types
 const {
     GraphQLObjectType,
     GraphQLString,
-    GraphQLInt,
     GraphQLID,
     GraphQLSchema,
     GraphQLList,
-    GraphQLInputObjectType
+   // GraphQLInputObjectType
 } = graphql;
 
-const authorize = (user) => {
-    return user ? true : false
-}
+const CommentType = new GraphQLObjectType({
+    name: 'Comment',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString },
+        email:  { type: GraphQLString },
+        body:  { type: GraphQLString },
+    })
+})
 
-const UserType = new GraphQLObjectType({
-    name: 'User',
+const PostType = new GraphQLObjectType({
+    name: 'Post',
+    fields: () => ({
+        id: { type: GraphQLID },
+        title: { type: GraphQLString},
+        body: { type: GraphQLString},
+        comments: {
+            type: new GraphQLList(CommentType),
+            resolve(parent, _) {
+                return PostResolvers.getCommentsByPostId(parent.id);
+            }
+        }
+    })
+})
+
+const AuthorType = new GraphQLObjectType({
+    name: 'Author',
     fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString},
         email: { type: GraphQLString},
-    })
-})
-
-const AuthPayLoadType = new GraphQLObjectType({
-    name: 'AuthPayLoad',
-    fields: () => (
-        {
-            token: { type: GraphQLString},
-            user: {
-                type: UserType
-            }
-        }
-    )
-})
-
-const DashboardType = new GraphQLObjectType({
-    name: 'Dashboard',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
-        widgets: {
-            type: new GraphQLList(WidgetType),
-            resolve(parent, args, context) {
-               return DashboardResolver.getWidgetsByDashboardId(parent.id);
+        website: { type: GraphQLString},
+        posts: {
+            type: new GraphQLList(PostType),
+            resolve(parent, _) {
+                return AuthorResolvers.getPostsByAuthorId(parent.id);
             }
         }
     })
 })
 
-const WidgetType = new GraphQLObjectType({
-    name: 'Widget',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
-        width: { type: GraphQLInt},
-        height: { type: GraphQLInt}
-    })
-})
-
-const WidgetInputType = new GraphQLInputObjectType({
-    name: 'WidgetInput',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
-        width: { type: GraphQLInt},
-        height: { type: GraphQLInt}
-    })
-})
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
-        users: {
-            type:  new GraphQLList(UserType),
-            resolve(_, args, context) {
-                if (authorize(context.user)) {
-                    return UserResolver.getUsers()
-                } else {
-                   throw new Error('No Authorized')
-                }
+        author: {
+            type:  AuthorType,
+            args: { authorId: { type: GraphQLID } },
+            resolve(_, args) {
+                return AuthorResolvers.getAuthorById(args.authorId);
             }
         },
-        dashboards: {
-            type: new GraphQLList(DashboardType),
-            resolve(_, args, context) {
-                return DashboardResolver.getDashboards()
+        authors: {
+            type:  new GraphQLList(AuthorType),
+            resolve(_) {
+                return AuthorResolvers.all();
             }
         },
-        widgets: {
-            type: new GraphQLList(WidgetType),
-            args: { id: { type: GraphQLID } },
-            resolve(_, args, context) {
-                return DashboardResolver.getWidgetsByDashboardId(args.id);
+        posts: {
+            type: new GraphQLList(PostType),
+            args: { authorId: { type: GraphQLID } },
+            resolve(_, args) {
+                return AuthorResolvers.getPostsByAuthorId(args.authorId);
+            }
+        },
+        comments: {
+            type: new GraphQLList(CommentType),
+            args: { postId: { type: GraphQLID } },
+            resolve(_, args) {
+                return CommentResolvers.getCommentsByPostId(args.postId);
             }
         }
     }
@@ -110,39 +93,39 @@ const RootQuery = new GraphQLObjectType({
 const Mutations = new GraphQLObjectType({
     name: 'Mutations',
     fields: {
-        addDashboard: {
-            type: DashboardType,
+        addAuthor: {
+            type: AuthorType,
             args: {
                 name: { type: GraphQLString },
-                description: { type: GraphQLString },
-                widgets: {
-                    type: new GraphQLList(WidgetInputType)
-                }
+                email: { type: GraphQLString },
+                website: { type: GraphQLString },
             },
-            resolve(_, args, context) {
-                return DashboardResolver.addDashboard(args);
+            resolve(_, args) {
+                return AuthorResolvers.addAuthor(args);
             }
 
         },
-        login: {
-            type: AuthPayLoadType,
+        addPost: {
+            type: PostType,
             args: {
-                email: { type: GraphQLString},
-                password: { type: GraphQLString}
+                authorId: { type: GraphQLID},
+                title: { type: GraphQLString},
+                body: { type: GraphQLString}
             },
-            resolve(parent, args, context) {
-               return AuthenticationResolver.login(args);
+            resolve(_, args) {
+               return PostResolvers.addPost(args);
             }
         },
-        signup: {
-            type: AuthPayLoadType,
+        addComment: {
+            type: CommentType,
             args: {
+                postId: { type: GraphQLID},
+                name: { type: GraphQLString},
                 email: { type: GraphQLString},
-                password: { type: GraphQLString},
-                name: { type: GraphQLString}
+                body: { type: GraphQLString}
             },
-            resolve(parent, args) {
-              return  AuthenticationResolver.signup(args);
+            resolve(_, args) {
+              return  CommentResolvers.addComment(args);
             }
         }
     }
