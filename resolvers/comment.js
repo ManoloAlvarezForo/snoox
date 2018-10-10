@@ -8,7 +8,7 @@ module.exports = {
     /**
      * Gets all posts from the Database.
      */
-    getAll: async () => {
+    comments: async () => {
         return await Comment.find({});
     },
 
@@ -20,6 +20,7 @@ module.exports = {
         try {
             const postFounded = await Post.findById(args.postId);
             const newComment = new Comment({
+                postId: args.postId,
                 name: args.name,
                 email: args.email,
                 body: args.body

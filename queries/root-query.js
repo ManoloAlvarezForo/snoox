@@ -9,6 +9,7 @@ const CommentResolvers = require('../resolvers/comment');
 const {
     GraphQLObjectType,
     GraphQLString,
+    GraphQLInt,
     GraphQLID,
     GraphQLSchema,
     GraphQLList,
@@ -31,6 +32,12 @@ const PostType = new GraphQLObjectType({
         id: { type: GraphQLID },
         title: { type: GraphQLString},
         body: { type: GraphQLString},
+        author: {
+            type: AuthorType,
+            resolve(parent, _) {
+                return AuthorResolvers.getAuthorById(parent.authorId);
+            }
+        },
         comments: {
             type: new GraphQLList(CommentType),
             resolve(parent, _) {
@@ -75,9 +82,28 @@ const RootQuery = new GraphQLObjectType({
         },
         posts: {
             type: new GraphQLList(PostType),
-            args: { authorId: { type: GraphQLID } },
             resolve(_, args) {
-                return AuthorResolvers.getPostsByAuthorId(args.authorId);
+                return PostResolvers.posts();
+            }
+        },
+        postsPaginated: {
+            type: new GraphQLList(PostType),
+            args: { 
+                authorId: { type: GraphQLID },
+                skip: { type: GraphQLInt },
+                limit: { type: GraphQLInt }
+             },
+            resolve(_, args) {
+                return PostResolvers.getPostsPaginatedByAuthorId(args.authorId, args.skip, args.limit);
+            }
+        },
+        postFilter: {
+            type: new GraphQLList(PostType),
+            args: { 
+                query: { type: GraphQLString }
+             },
+            resolve(_, args) {
+                return PostResolvers.getPostFilter(args.query);
             }
         },
         comments: {
@@ -86,7 +112,14 @@ const RootQuery = new GraphQLObjectType({
             resolve(_, args) {
                 return CommentResolvers.getCommentsByPostId(args.postId);
             }
+        },
+        commentsAll: {
+            type: new GraphQLList(CommentType),
+            resolve(_, args) {
+                return CommentResolvers.comments();
+            }
         }
+
     }
 });
 

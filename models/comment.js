@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
  * Comment mongoose schema.
  */
 const commentSchema = new Schema({
+    postId: String,
     name: String,
     email: String,
     body: String

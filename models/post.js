@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
  * Post mongoose schema.
  */
 const postSchema = new Schema({
+    authorId: String,
     title: String,
     body: String,
     comments: [{ type: Schema.Types.ObjectId, ref: 'comment'}]
