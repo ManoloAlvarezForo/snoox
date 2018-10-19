@@ -9,15 +9,55 @@ module.exports = {
      * Gets all posts from the Database.
      */
     posts: async () => {
-        console.log('[Server]: Get Posts Resolver method was called.')
         return await Post.find({});
+    },
+
+    /**
+     * Gets the count of post elements.
+     */
+    count: async () => {
+        return await Post.count();
+    },
+
+    /**
+     * Gets data related with pagination count, pages number and the posts elements.
+     */
+    getPaginatedData: async (offset, limit) => {
+        const count = await Post.count();
+        let pagesNumber = 1;
+
+        if (count > limit) {
+            pagesNumber = Math.ceil(count / limit);
+        }
+
+        const posts = await Post.find().skip(offset > 0 ? ((offset - 1) * limit) : 0).limit(limit);
+
+        return {
+            count,
+            pagesNumber,
+            posts
+        }
     },
 
     /**
      * Gets post paginated by an Author id.
      */
     getPostsPaginatedByAuthorId: async (authorId, skip, limit) => {
-        return await Post.find({authorId: authorId}).skip(skip).limit(limit);
+        return await Post.find({ authorId: authorId }).skip(skip).limit(limit);
+    },
+
+    /**
+     * Gets the paginated post elements according a offset and a limit.
+     */
+    getPostsPaginated: async (offset, limit) => {
+        return await Post.find({}).skip(offset).limit(limit);
+    },
+
+    /**
+     * Gets a post element according a post id.
+     */
+    getPostById: async (postId) => {
+        return await Post.findById(postId);
     },
 
     /**
@@ -25,9 +65,7 @@ module.exports = {
      */
     getPostFilter: async (query) => {
         const regexValue = new RegExp(query, 'g');
-        const response = await Post.aggregate([{ $match: {  title: { $regex: regexValue}}}]);
-        
-        return response;
+        return await Post.aggregate([{ $match: { title: { $regex: regexValue } } }, { "$addFields": { "id": { "$toString": "$_id" } } }]);
     },
 
     /**
@@ -50,19 +88,11 @@ module.exports = {
             await newPost.save();
             authorFounded.posts.push(newPost);
             await authorFounded.save();
-            console.log(`Post: \n${newPost} \nAdded succesfully.`)
             return newPost;
 
         } catch (error) {
             console.log('Error to add a post: [' + error.message + ']');
         }
-    },
-
-    /**
-     * Searchs in the 
-     */
-    search: async(query) => {
-
     }
 }
 

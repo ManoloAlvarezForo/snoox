@@ -6,10 +6,12 @@ const Schema = mongoose.Schema;
  * Comment mongoose schema.
  */
 const commentSchema = new Schema({
-    postId: String,
+    parentId: String,
+    isToPost: { type: Boolean, default: false},
     name: String,
     email: String,
-    body: String
+    body: String,
+    comments: [{ type: Schema.Types.ObjectId, ref: 'comment'}]
 });
 
 module.exports = mongoose.model('comment', commentSchema);

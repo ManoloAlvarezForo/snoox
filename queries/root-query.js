@@ -13,6 +13,7 @@ const {
     GraphQLID,
     GraphQLSchema,
     GraphQLList,
+    GraphQLBoolean,
    // GraphQLInputObjectType
 } = graphql;
 
@@ -23,6 +24,13 @@ const CommentType = new GraphQLObjectType({
         name: { type: GraphQLString },
         email:  { type: GraphQLString },
         body:  { type: GraphQLString },
+        isToPost: { type: GraphQLBoolean },
+        comments: {
+            type: new GraphQLList(CommentType),
+            resolve(parent, _) {
+                return CommentResolvers.getCommentsByParentId(parent.id, false);
+            }
+        }
     })
 })
 
@@ -63,6 +71,18 @@ const AuthorType = new GraphQLObjectType({
     })
 })
 
+const PostsPaginatedType = new GraphQLObjectType({
+    name: 'PostsPaginated',
+    fields: () => ({
+        count: {
+            type: GraphQLInt
+        },
+        posts: { 
+            type: new GraphQLList(PostType)
+        },
+        pagesNumber: { type: GraphQLInt }
+    })
+})
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
@@ -72,6 +92,13 @@ const RootQuery = new GraphQLObjectType({
             args: { authorId: { type: GraphQLID } },
             resolve(_, args) {
                 return AuthorResolvers.getAuthorById(args.authorId);
+            }
+        },
+        post: {
+            type:  PostType,
+            args: { postId: { type: GraphQLID } },
+            resolve(_, args) {
+                return PostResolvers.getPostById(args.postId);
             }
         },
         authors: {
@@ -87,6 +114,16 @@ const RootQuery = new GraphQLObjectType({
             }
         },
         postsPaginated: {
+            type: PostsPaginatedType,
+            args: {
+                offset: { type: GraphQLInt },
+                limit: { type: GraphQLInt}
+            },
+            resolve(_, args) {
+                return PostResolvers.getPaginatedData(args.offset, args.limit);
+            }
+        },
+        postsPaginatedByAutorId: {
             type: new GraphQLList(PostType),
             args: { 
                 authorId: { type: GraphQLID },
@@ -108,9 +145,12 @@ const RootQuery = new GraphQLObjectType({
         },
         comments: {
             type: new GraphQLList(CommentType),
-            args: { postId: { type: GraphQLID } },
+            args: { 
+                parentId: { type: GraphQLID },
+                isToPost: { type: GraphQLBoolean}
+            },
             resolve(_, args) {
-                return CommentResolvers.getCommentsByPostId(args.postId);
+                return CommentResolvers.getCommentsByParentId(args.parentId, args.isToPost);
             }
         },
         commentsAll: {
@@ -152,10 +192,11 @@ const Mutations = new GraphQLObjectType({
         addComment: {
             type: CommentType,
             args: {
-                postId: { type: GraphQLID},
+                parentId: { type: GraphQLID},
                 name: { type: GraphQLString},
                 email: { type: GraphQLString},
-                body: { type: GraphQLString}
+                body: { type: GraphQLString},
+                isToPost: {type: GraphQLBoolean}
             },
             resolve(_, args) {
               return  CommentResolvers.addComment(args);
