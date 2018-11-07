@@ -26,18 +26,19 @@ const app = express();
 mongoose.Promise = global.Promise;
 
 // mongoose.connect('mongodb://localhost/nsone');
-const promise = mongoose.connect('mongodb://localhost/noox', {
+const promise = mongoose.connect('mongodb://localhost/kisses', {
     //other options
 });
 
 // Using body parser to body responses.
 app.use(bodyParser.json());
 
-app.use(function(req, res, next) {
+// 
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-  });
+});
 
 // Rest route for authentication.
 app.use('/authenticate', AuthenticationRoute);
@@ -48,7 +49,8 @@ const authMiddleware = jwt({
     credentialsRequired: false
 });
 
-// Cors for requests that are not in the same domain.
+// Cors for requests that are not in the same domain in production this shold be removed
+// and the backend and frontend shold be in the same site.
 app.use(cors());
 
 // GraphQL Middleware for requests.
@@ -60,7 +62,7 @@ app.use('/graphql', express_graphql(req => ({
     graphiql: true,
     context: {
         user: req.user
-      }
+    }
 })));
 
 // HTTP port.
@@ -71,7 +73,7 @@ const https_port = 8443;
 
 //Start the Server.
 promise.then(function (db) {
-    app.listen(port, () => console.log(`GraphQL Server is listening on port ${port}`));
-    // Uncomment this code code to enable https for the server.
-    // https.createServer(options, app).listen(https_port, () =>  console.log(`GraphQL-Noox Server is listening on port ${https_port}`));
+    app.listen(port, () => console.log(`GraphQL Http Server is listening on port ${port}`));
+    // Uncomment above code code to enable https for the server.
+    // https.createServer(options, app).listen(https_port, () =>  console.log(`SECURE GraphQL Https Server is listening on port ${https_port}`));
 });

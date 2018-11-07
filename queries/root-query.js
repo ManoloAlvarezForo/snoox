@@ -24,8 +24,8 @@ const UserType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
         id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        email: { type: GraphQLString},
+        name: { type: GraphQLString },
+        email: { type: GraphQLString },
     })
 })
 
@@ -33,7 +33,7 @@ const AuthPayLoadType = new GraphQLObjectType({
     name: 'AuthPayLoad',
     fields: () => (
         {
-            token: { type: GraphQLString},
+            token: { type: GraphQLString },
             user: {
                 type: UserType
             }
@@ -45,12 +45,12 @@ const DashboardType = new GraphQLObjectType({
     name: 'Dashboard',
     fields: () => ({
         id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
         widgets: {
             type: new GraphQLList(WidgetType),
             resolve(parent, args, context) {
-               return DashboardResolver.getWidgetsByDashboardId(parent.id);
+                return DashboardResolver.getWidgetsByDashboardId(parent.id);
             }
         }
     })
@@ -60,10 +60,10 @@ const WidgetType = new GraphQLObjectType({
     name: 'Widget',
     fields: () => ({
         id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
-        width: { type: GraphQLInt},
-        height: { type: GraphQLInt}
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        width: { type: GraphQLInt },
+        height: { type: GraphQLInt }
     })
 })
 
@@ -71,24 +71,25 @@ const WidgetInputType = new GraphQLInputObjectType({
     name: 'WidgetInput',
     fields: () => ({
         id: { type: GraphQLID },
-        name: { type: GraphQLString},
-        description: { type: GraphQLString},
-        width: { type: GraphQLInt},
-        height: { type: GraphQLInt}
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        width: { type: GraphQLInt },
+        height: { type: GraphQLInt }
     })
 })
+
+const validateAuthentication = (user) => {
+    if (!user) throw new Error('You are not authorized!')
+}
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
         users: {
-            type:  new GraphQLList(UserType),
-            resolve(_, args, context) {
-                if (authorize(context.user)) {
-                    return UserResolver.getUsers()
-                } else {
-                   throw new Error('No Authorized')
-                }
+            type: new GraphQLList(UserType),
+            resolve(_, __, context) {
+                validateAuthentication(context.user);
+                return UserResolver.getUsers();
             }
         },
         dashboards: {
@@ -100,7 +101,7 @@ const RootQuery = new GraphQLObjectType({
         widgets: {
             type: new GraphQLList(WidgetType),
             args: { id: { type: GraphQLID } },
-            resolve(_, args, context) {
+            resolve(_, args) {
                 return DashboardResolver.getWidgetsByDashboardId(args.id);
             }
         }
@@ -119,7 +120,7 @@ const Mutations = new GraphQLObjectType({
                     type: new GraphQLList(WidgetInputType)
                 }
             },
-            resolve(_, args, context) {
+            resolve(_, args) {
                 return DashboardResolver.addDashboard(args);
             }
 
@@ -127,22 +128,22 @@ const Mutations = new GraphQLObjectType({
         login: {
             type: AuthPayLoadType,
             args: {
-                email: { type: GraphQLString},
-                password: { type: GraphQLString}
+                email: { type: GraphQLString },
+                password: { type: GraphQLString }
             },
-            resolve(parent, args, context) {
-               return AuthenticationResolver.login(args);
+            resolve(_, args) {
+                return AuthenticationResolver.login(args);
             }
         },
         signup: {
             type: AuthPayLoadType,
             args: {
-                email: { type: GraphQLString},
-                password: { type: GraphQLString},
-                name: { type: GraphQLString}
+                email: { type: GraphQLString },
+                password: { type: GraphQLString },
+                name: { type: GraphQLString }
             },
-            resolve(parent, args) {
-              return  AuthenticationResolver.signup(args);
+            resolve(_, args) {
+                return AuthenticationResolver.signup(args);
             }
         }
     }
