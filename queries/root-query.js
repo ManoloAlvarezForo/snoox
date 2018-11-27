@@ -1,11 +1,11 @@
 const graphql = require('graphql');
 
-// Resolvers
+// Resolvers.
 const UserResolver = require('../resolvers/user');
 const AuthenticationResolver = require('../resolvers/authentication');
-const DashboardResolver = require('../resolvers/dashboard');
+const ProductResolver = require('../resolvers/product');
 
-// Graphql types
+// Graphql types.
 const {
     GraphQLObjectType,
     GraphQLString,
@@ -16,10 +16,14 @@ const {
     GraphQLInputObjectType
 } = graphql;
 
-const authorize = (user) => {
-    return user ? true : false
-}
+/**
+ * Authorized message.
+ */
+const AUTHORIZED_MESSAGE = 'You are not authorized!';
 
+/**
+ * User GraphQL model type.
+ */
 const UserType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
@@ -29,6 +33,9 @@ const UserType = new GraphQLObjectType({
     })
 })
 
+/**
+ * Payload GraphQL model type.
+ */
 const AuthPayLoadType = new GraphQLObjectType({
     name: 'AuthPayLoad',
     fields: () => (
@@ -41,50 +48,42 @@ const AuthPayLoadType = new GraphQLObjectType({
     )
 })
 
-const DashboardType = new GraphQLObjectType({
-    name: 'Dashboard',
+/**
+ * Product GraphQL model type.
+ */
+const ProductType = new GraphQLObjectType({
+    name: 'Product',
     fields: () => ({
         id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        description: { type: GraphQLString },
-        widgets: {
-            type: new GraphQLList(WidgetType),
-            resolve(parent, args, context) {
-                return DashboardResolver.getWidgetsByDashboardId(parent.id);
-            }
-        }
+        name: { type: GraphQLString},
+        productId: { type: GraphQLInt},
+        description: { type: GraphQLString},
+        price: { type: GraphQLInt},
+        availableAmmount: { type: GraphQLInt},
+        category: { type: GraphQLString},
+        images: { type: new GraphQLList(GraphQLString)}
     })
 })
 
-const WidgetType = new GraphQLObjectType({
-    name: 'Widget',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        description: { type: GraphQLString },
-        width: { type: GraphQLInt },
-        height: { type: GraphQLInt }
-    })
-})
-
-const WidgetInputType = new GraphQLInputObjectType({
-    name: 'WidgetInput',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        description: { type: GraphQLString },
-        width: { type: GraphQLInt },
-        height: { type: GraphQLInt }
-    })
-})
-
+/**
+ * Evaluates if the user authenticated exists.
+ * 
+ * @param {User to be evaluated} user 
+ */
 const validateAuthentication = (user) => {
-    if (!user) throw new Error('You are not authorized!')
+    if (!user) throw new Error(AUTHORIZED_MESSAGE)
 }
 
+
+/**
+ * Contains all GraphQL queries.
+ */
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
+        /**
+         * Query to gets the all users of the Database.
+         */
         users: {
             type: new GraphQLList(UserType),
             resolve(_, __, context) {
@@ -92,39 +91,45 @@ const RootQuery = new GraphQLObjectType({
                 return UserResolver.getUsers();
             }
         },
-        dashboards: {
-            type: new GraphQLList(DashboardType),
+        /**
+         * Query to gets the all products of the Database.
+         */
+        products: {
+            type: new GraphQLList(ProductType),
             resolve(_, args, context) {
-                return DashboardResolver.getDashboards()
-            }
-        },
-        widgets: {
-            type: new GraphQLList(WidgetType),
-            args: { id: { type: GraphQLID } },
-            resolve(_, args) {
-                return DashboardResolver.getWidgetsByDashboardId(args.id);
+                // validateAuthentication(context.user);
+                return ProductResolver.getAllProducts()
             }
         }
     }
 });
 
+/**
+ * Contains all GraphQL mutations. 
+ */
 const Mutations = new GraphQLObjectType({
     name: 'Mutations',
     fields: {
-        addDashboard: {
-            type: DashboardType,
+        /**
+         * Mutation to add a new product in the Database.
+         */
+        addProduct: {
+            type: ProductType,
             args: {
-                name: { type: GraphQLString },
-                description: { type: GraphQLString },
-                widgets: {
-                    type: new GraphQLList(WidgetInputType)
-                }
+                name: { type: GraphQLString},
+                description: { type: GraphQLString},
+                price: { type: GraphQLInt},
+                availableAmmount: { type: GraphQLInt},
+                category: { type: GraphQLString},
+                images: { type: new GraphQLList(GraphQLString)}
             },
             resolve(_, args) {
-                return DashboardResolver.addDashboard(args);
+                return ProductResolver.addProduct(args);
             }
-
         },
+        /**
+         * Mutation to Log in.
+         */
         login: {
             type: AuthPayLoadType,
             args: {
@@ -135,6 +140,9 @@ const Mutations = new GraphQLObjectType({
                 return AuthenticationResolver.login(args);
             }
         },
+        /**
+         * Mutation to Sign Up a new account.
+         */
         signup: {
             type: AuthPayLoadType,
             args: {

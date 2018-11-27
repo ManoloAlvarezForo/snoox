@@ -8,7 +8,7 @@ const AuthenticationRoute = require('./routes/authentication');
 const bodyParser = require('body-parser');
 
 // ssl https module and File System (fs)
-var https = require('https');
+// var https = require('https');
 
 // fs plugin to read files
 var fs = require('fs');
@@ -22,19 +22,21 @@ var options = {
 // Declared app
 const app = express();
 
+// Share static resources only using express static.
+app.use(express.static('/assets'));
+app.use('/static', express.static('/assets'));
+app.use('/static', express.static(__dirname + '/assets'));
+
 // Db connection.
 mongoose.Promise = global.Promise;
 
-// mongoose.connect('mongodb://localhost/nsone');
-const promise = mongoose.connect('mongodb://localhost/kisses', {
-    //other options
-});
+// mongoose.connect('mongodb://localhost/<yourDatabase>');
+const promise = mongoose.connect('mongodb://localhost/kisses');
 
 // Using body parser to body responses.
 app.use(bodyParser.json());
 
-// 
-app.use(function (req, res, next) {
+app.use(function (_, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
@@ -66,14 +68,14 @@ app.use('/graphql', express_graphql(req => ({
 })));
 
 // HTTP port.
-const port = app.get('port') || 4000;
+const httpPort = app.get('port') || 4000;
 
 // HTTPS port.
-const https_port = 8443;
+// const httpsPort = 8443;
 
-//Start the Server.
-promise.then(function (db) {
-    app.listen(port, () => console.log(`GraphQL Http Server is listening on port ${port}`));
-    // Uncomment above code code to enable https for the server.
-    // https.createServer(options, app).listen(https_port, () =>  console.log(`SECURE GraphQL Https Server is listening on port ${https_port}`));
+//Launchs the Server.
+promise.then(() => {
+    app.listen(httpPort, () => console.log(`SERVER http://localhost:${httpPort} is up.`));
+    // Uncomment bellow code code to enable https for the server.
+    // https.createServer(options, app).listen(httpsPort, () =>  console.log(`SECURE GraphQL Https Server is listening on port ${httpsPort}`));
 });
