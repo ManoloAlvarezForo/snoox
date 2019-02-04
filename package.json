@@ -1,23 +1,37 @@
 {
-  "name": "nooxserver",
+  "name": "apolloserver",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "src/app.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon --exec babel-node src/app.js",
+    "build": "babel src --out-dir dist",
+    "serve": "node dist/app.js"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "apollo-server": "^2.2.6",
+    "apollo-server-express": "^2.2.6",
+    "babel-loader": "^8.0.0-beta.6",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
     "express": "^4.15.4",
     "express-graphql": "^0.6.12",
+    "express-jwt": "^5.3.1",
     "express-promise-router": "^2.0.0",
     "graphql": "^0.13.2",
     "joi": "^10.6.0",
+    "jsonwebtoken": "^8.3.0",
     "mongodb": "^2.2.31",
     "mongoose": "^4.11.7",
     "morgan": "^1.8.2"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "nodemon": "^1.18.9"
   }
 }
