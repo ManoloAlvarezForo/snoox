@@ -109,12 +109,6 @@ type Applicant {
     source: String
 }
 
-type Query {
-    users: [User]
-    applicants: [Applicant]
-    applicantById(id: String): Applicant
-}
-
 type AuthPayLoad {
     token: String
     user: User
@@ -145,12 +139,63 @@ type Route {
     routeNumber: String
 }
 
+input InputParticipant {
+    id: String
+}
+
+type Participant {
+    id: String
+}
+
+input InputEvent {
+    title: String,
+    date: String,
+    timeFrom: String,
+    timeTo: String,
+    participants:[String],
+    description: String
+}
+
+type Event {
+    id: String,
+    title: String,
+    date: String,
+    timeFrom: String,
+    timeTo: String,
+    participants:[String],
+    description: String,
+    createdDate: String
+}
+
+type CalendarEvent {
+    date: String,
+    events: [Event]
+}
+
+type BasicApplicant {
+    id: String,
+    name: String,
+    lastName: String
+}
+
+type Query {
+    users: [User]
+    applicants: [Applicant]
+    applicantById(id: String): Applicant
+    events: [Event]
+    eventById(id: String): Event
+    eventsByDate(from: String, to: String): [CalendarEvent]
+    calendarEventsByMonth(month: String, year: String, locale: String): [CalendarEvent]
+    applicantsByFilter(query: String, properties: [String]): [Applicant]
+}
+
 type Mutation {
     signup(email: String, password: String, name: String): AuthPayLoad
     login(email: String, password: String): AuthPayLoad
     addApplicant(applicant: AplicantInputNew): Applicant
     updateApplicant(applicantToUpdate: AplicantInput): ApplicantUpdatedOutput
     addRoute(route: RouteInput): Route
+    addEvent(event: InputEvent): Event
 }
 `;
 

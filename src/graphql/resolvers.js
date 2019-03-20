@@ -2,6 +2,7 @@ import * as AuthenticationResolver from '../resolvers/authentication';
 import * as UserResolver from '../resolvers/user';
 import * as ApplicantResolver from '../resolvers/applicant';
 import * as RouteResolver from '../resolvers/route';
+import * as EventResolver from '../resolvers/event';
 
 /**
  * Authorized message.
@@ -30,6 +31,21 @@ const resolvers = {
     applicantById(_, args, context) {
       // validateAuthentication(context.user);
       return ApplicantResolver.getApplicantById(args.id);
+    },
+    events(_, __, context) {
+      return EventResolver.getEvents();
+    },
+    eventById(_, {id}, context) {
+      return EventResolver.getEventById(id);
+    },
+    eventsByDate(_, args, context) {
+      return EventResolver.getEventsByDate(args.from, args.to);
+    },
+    calendarEventsByMonth(_, {month, year, locale}, context) {
+      return EventResolver.getCalendarEventsByMonth(month, year, locale);
+    },
+    applicantsByFilter(_, {query, properties}, context) {
+      return ApplicantResolver.getApplicantsByFilter(query, properties);
     }
   },
   Mutation: {
@@ -50,6 +66,9 @@ const resolvers = {
     addRoute(_, {route}, context) {
       validateAuthentication(context);
       return RouteResolver.addRoute(route);
+    },
+    addEvent(_, {event}, context) {
+      return EventResolver.addEvent(event);
     }
   }
 };
